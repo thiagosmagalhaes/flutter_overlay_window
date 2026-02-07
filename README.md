@@ -1,3 +1,18 @@
+## flutter_overlay_window
+
+## Fixes in this release
+
+### 🐛 Bug Fixes
+
+* **Fix NullPointerException in OverlayService**: Resolved a crash that occurred when the Android system restarted the service after it was terminated. Added a null intent check in the `onStartCommand()` method.
+
+### ✅ Compilation Warnings
+
+**Note**: The compilation warnings reported in previous versions have been fully resolved in this release.
+The plugin no longer uses deprecated Android APIs or unchecked operations, ensuring cleaner builds and better compatibility with recent Android versions.
+
+---
+
 ## Preview
 
 |                                                          TrueCaller overlay example                                                          |                                                        click-through overlay example                                                        |                                                         Messanger chat-head example                                                         |

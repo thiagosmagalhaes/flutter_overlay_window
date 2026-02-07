@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -15,6 +16,7 @@ import android.graphics.Point;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -46,6 +48,7 @@ import io.flutter.plugin.common.BasicMessageChannel;
 import io.flutter.plugin.common.JSONMessageCodec;
 import io.flutter.plugin.common.MethodChannel;
 
+@SuppressWarnings("deprecation")
 public class OverlayService extends Service implements View.OnTouchListener {
     private final int DEFAULT_NAV_BAR_HEIGHT_DP = 48;
     private final int DEFAULT_STATUS_BAR_HEIGHT_DP = 25;
@@ -65,7 +68,7 @@ public class OverlayService extends Service implements View.OnTouchListener {
     private int clickableFlag = WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
 
-    private Handler mAnimationHandler = new Handler();
+    private Handler mAnimationHandler = new Handler(Looper.getMainLooper());
     private float lastX, lastY;
     private int lastYPosition;
     private boolean dragging;
@@ -158,10 +161,12 @@ public class OverlayService extends Service implements View.OnTouchListener {
             Rect bounds = windowMetrics.getBounds();
             szWindow.set(bounds.width(), bounds.height());
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            @SuppressWarnings("deprecation")
             Display display = windowManager.getDefaultDisplay();
             display.getSize(szWindow);
         } else {
             DisplayMetrics displaymetrics = new DisplayMetrics();
+            @SuppressWarnings("deprecation")
             Display display = windowManager.getDefaultDisplay();
             display.getMetrics(displaymetrics);
             int w = displaymetrics.widthPixels;
@@ -201,6 +206,7 @@ public class OverlayService extends Service implements View.OnTouchListener {
             Rect bounds = windowMetrics.getBounds();
             dm.heightPixels = bounds.height();
         } else {
+            @SuppressWarnings("deprecation")
             Display display = windowManager.getDefaultDisplay();
             display.getRealMetrics(dm);
         }
@@ -358,7 +364,12 @@ public class OverlayService extends Service implements View.OnTouchListener {
                 .setContentIntent(pendingIntent)
                 .setVisibility(WindowSetup.notificationVisibility)
                 .build();
-        startForeground(OverlayConstants.NOTIFICATION_ID, notification);
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(OverlayConstants.NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
+        } else {
+            startForeground(OverlayConstants.NOTIFICATION_ID, notification);
+        }
         instance = this;
     }
 
